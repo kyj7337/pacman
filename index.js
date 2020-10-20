@@ -1,42 +1,67 @@
 const pac = document.body
   .getElementsByTagName("div")[0]
   .getElementsByClassName("pac")[0];
-
+let distance = 15;
 window.addEventListener("keydown", (e) => handle(e));
 
-const pacPosition = (keycode) => {
-  console.log(keycode);
-  console.log(pac);
+const pacPosition = async ({ key, left, top }) => {
+  // console.log(keycode);
+  // console.log(pac);
+  const moveAction = () => {
+    if (key === 39) {
+      // ! Right
+      pac.style.left = `${distance + left}` + "px";
+      pac.style.transform = "unset";
+    } else if (key === 37) {
+      // ! Left
+      pac.style.left = `${left - distance}` + "px";
+      pac.style.transform = "scaleX(-1)";
+    } else if (key === 38) {
+      // ! Up
+      pac.style.top = `${top - distance}` + "px";
+      pac.style.transform = "rotate(270deg)";
+    } else if (key === 40) {
+      // ! Down
+      pac.style.top = `${top + distance}` + "px";
+      pac.style.transform = "rotate(90deg)";
+    }
+    return Promise.resolve({
+      top: Number(pac.style.top.split("px")[0]),
+      left: Number(pac.style.left.split("px")[0]),
+    });
+  };
+  await moveAction().then((res) => {
+    restrictedSite({ left: res.left, top: res.top });
+  });
+};
+
+const handle = (e) => {
   let leftPosition = Number(pac.style.left.split("px")[0]);
-  console.log("pacstyle", pac.style.top);
   let topPosition = Number(pac.style.top.split("px")[0]);
 
-  if (keycode === 39) {
-    pac.style.left = `${20 + leftPosition}` + "px";
-    pac.style.transform = "unset";
-  } else if (keycode === 37) {
-    pac.style.left = `${leftPosition - 20}` + "px";
-    pac.style.transform = "scaleX(-1)";
-  } else if (keycode === 38) {
-    console.log("topPosition", topPosition);
-    pac.style.top = `${topPosition - 20}` + "px";
-    pac.style.transform = "rotate(270deg)";
-  } else if (keycode === 40) {
-    pac.style.top = `${topPosition + 20}` + "px";
-    pac.style.transform = "rotate(90deg)";
+  if (leftPosition < 0 || leftPosition >= 705) {
+    if (leftPosition < 0) {
+      pac.style.left = `${leftPosition + distance}` + "px";
+      pac.style.transform = "unset";
+    } else if (topPosition === 425 && leftPosition >= 705) {
+      pac.style.left = "0px";
+      alert("성공하셨습니다");
+    }
+  } else {
+    pacPosition({ key: e.keyCode, left: leftPosition, top: topPosition });
   }
 };
-// transform:rotate(0deg); 움직일때
-const handle = (e) => {
-  pacPosition(e.keyCode);
-  //   if (e.keyCode === 39) {
-  //     console.log("오른쪽");
-  //   } else if (e.keyCode === 37) {
-  //     console.log("왼쪽");
-  //   } else if (e.keyCode === 40) {
-  //     console.log("아래");
-  //   } else if (e.keyCode === 38) {
-  //     console.log("위");
-  //   }
-  //   console.log(e);
+
+const restrictedSite = ({ left, top }) => {
+  console.log("left:", left, "top:", top);
+  // * 1. 첫번째 직진 코스
+  if (0 <= left && left <= 135) {
+    if (top > 425 || top < 425) {
+      pac.style.top = "425px";
+      pac.style.transform = "unset";
+    }
+  }
+  if (left === 150 && top === 725) {
+    console.log("세로길");
+  }
 };

@@ -11,6 +11,6 @@ body {
 .pac {
   width: 25px;
   position: absolute;
-  left: 0px;
+  transition: all 0.3s ease;
   /* top: 425px; */
 }
